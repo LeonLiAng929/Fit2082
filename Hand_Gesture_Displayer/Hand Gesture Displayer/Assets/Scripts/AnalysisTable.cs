@@ -35,6 +35,7 @@ public class AnalysisTable : MonoBehaviour
     public Transform entryTemplate;
     public TMP_Text sum;
     public TMP_Text avg;
+    public TMP_Text similarity;
 
     private void Awake()
     {
@@ -73,11 +74,11 @@ public class AnalysisTable : MonoBehaviour
     /// <summary>
     /// Displays result of an analysis in the analysis table in the scene.
     /// </summary>
-    public void GenerateReport(double euclideanSum)
+    public void GenerateReport(double euclideanSum, double similarityRate)
     {
         sum.text = "Sum: " + euclideanSum.ToString();
         avg.text = "Avg: " + (euclideanSum / tableEntries.Count).ToString();
-
+        similarity.text = "Similarity Rate: " + similarityRate.ToString() + "%";
         if (entryTransforms.Count != 0)
         {
             foreach (Transform entrytransform in entryTransforms)

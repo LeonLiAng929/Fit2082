@@ -443,5 +443,10 @@ public class Gesture
 
         }
     }
+
+    public Data[] GetProcessedData()
+    {
+        return processed_data;
+    }
 }
 
