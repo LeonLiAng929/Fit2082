@@ -55,7 +55,7 @@ public class Gesture
     private float last_timestamp; // the very last time registered in the .csv file, same as the duration of the gesture.
     private float pre_timestamp; // previous timestamp recorded in the .csv file.
     private int init = 1;
-    private GameObject gestureTag;
+    private string gestureTag;
     private GameObject hand;
     private TextAsset motion_data;
     private Vector3 position_factor = new Vector3(0,0,0);// will be used to adjust the postion of the hand on the screen.
@@ -87,7 +87,7 @@ public class Gesture
     /// <summary>
     /// Set a tag in the scene that will appear below the hand model. Format of this tag can be "Export1","Zoom0"...etc.
     /// </summary>
-    public void SetTag(GameObject tag)
+    public void SetTag(string tag)
     {
         gestureTag = tag;
     }
@@ -95,7 +95,7 @@ public class Gesture
     /// <summary>
     /// Get the tag that is assigned to this gesture.
     /// </summary>
-    public GameObject getTag()
+    public string getTag()
     {
         return gestureTag;
     }
@@ -141,7 +141,7 @@ public class Gesture
         TranslateToOrigin();
         Rescale();
 
-        gestureTag.transform.localPosition = centroid - position_factor - new Vector3(0, rescaleReference.y/2,0);
+        //gestureTag.transform.localPosition = centroid - position_factor - new Vector3(0, rescaleReference.y/2,0);
 
         init_coordinates = processed_data[0].jointsCoordinate;
 
@@ -442,6 +442,11 @@ public class Gesture
             }
 
         }
+    }
+
+    public void SetRescaleReference(Vector3 scale)
+    {
+        rescaleReference = scale;
     }
 
     public Data[] GetProcessedData()

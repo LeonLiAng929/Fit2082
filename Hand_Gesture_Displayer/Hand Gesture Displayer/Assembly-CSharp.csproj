@@ -70,6 +70,8 @@
     <Compile Include="Assets\Scripts\Gesture.cs" />
     <Compile Include="Assets\Scripts\GestureDisplayer.cs" />
     <Compile Include="Assets\Scripts\MainMenu.cs" />
+    <Compile Include="Assets\Scripts\TagDisplayer.cs" />
+    <Compile Include="Assets\Scripts\TagDisplayer_Aux.cs" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
     <None Include="Assets\Hand Models\OculusHandModels1.0\LICENSE.txt" />
     <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
