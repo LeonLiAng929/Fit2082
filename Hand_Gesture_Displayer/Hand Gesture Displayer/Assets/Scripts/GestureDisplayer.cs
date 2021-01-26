@@ -20,10 +20,13 @@
  */
 using System.Collections;
 using System.Collections.Generic;
-using System;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Xml;
+using System;
 
 public class GestureDisplayer : MonoBehaviour
 {
@@ -37,7 +40,7 @@ public class GestureDisplayer : MonoBehaviour
         public string tag;
         public GameObject handModel;
         public TextAsset[] CsvData;  // an array of csv files recorded from people for one particular gesutrue.
-        public Vector3[] PositionFactor;
+        //public Vector3[] PositionFactor;
         public int Length()
         {
             return CsvData.Length;
@@ -60,6 +63,91 @@ public class GestureDisplayer : MonoBehaviour
     #region Singleton
     public static GestureDisplayer instance;
     #endregion
+
+    /*#region Configuration Mngmnt
+    private void InitializePoolsByConfig()
+    {
+        XmlDocument configDocument = new XmlDocument();
+        configDocument.Load(@"Assets/preconfig.xml");
+        GameObject handModelObj = GameObject.Find(configDocument.DocumentElement.SelectSingleNode("handmodelname").InnerText);
+        List<string> dataDirectories = new List<string>();
+
+        XmlNode csvDirectoriesNode = configDocument.DocumentElement.SelectSingleNode("pathtocsvdirectories");
+        if (csvDirectoriesNode.Attributes.Count > 0 && csvDirectoriesNode.Attributes[0].Value == "array")
+        {
+            foreach (XmlNode dirNode in csvDirectoriesNode.ChildNodes)
+                dataDirectories.Add(dirNode.InnerText);
+        }
+
+        pools = new List<GesturePool>();
+        Dictionary<string, Tuple<List<string>, List<Vector3>>> poolFilesData = new Dictionary<string, Tuple<List<string>, List<Vector3>>>();
+        int distanceSize = 300;
+
+        for (int i = 0; i < dataDirectories.Count; i++)
+        {
+            List<string> files = Directory.GetFiles(dataDirectories[i]).ToList();
+            if (files.Count > 1)
+            {
+                files = files.OrderBy(item => item.Substring(item.LastIndexOf("#"))).ToList();
+                for (int j = 0; j < files.Count; j += 2)
+                {
+                    if (File.Exists(files[j]) && File.Exists(files[j + 1]))
+                    {
+                        FileInfo f1 = new FileInfo(files[j]);
+                        FileInfo f2 = new FileInfo(files[j + 1]);
+                        if (f1.Length > f2.Length)
+                        {
+                            string key = f1.Name.Substring(f1.Name.IndexOf("_") + 1, +f1.Name.IndexOf("#") - (f1.Name.IndexOf("_") + 1));
+                            if (poolFilesData.ContainsKey(key))
+                            {
+                                poolFilesData[key].Item1.Add(File.ReadAllText(files[j]));
+                                // i = row and j = col
+                                poolFilesData[key].Item2.Add(new Vector3(j / 2 * distanceSize, i * distanceSize, 0));
+                            }
+                            else
+                                poolFilesData.Add(
+                                    key,
+                                    new Tuple<List<string>, List<Vector3>>(
+                                        new List<string>() { File.ReadAllText(files[j]) },
+                                        new List<Vector3>() { new Vector3(j / 2 * distanceSize, i * distanceSize, 0) }));
+                        }
+                        else
+                        {
+                            string key = f2.Name.Substring(f2.Name.IndexOf("_") + 1, +f2.Name.IndexOf("#") - (f2.Name.IndexOf("_") + 1));
+                            if (poolFilesData.ContainsKey(key))
+                            {
+                                poolFilesData[key].Item1.Add(File.ReadAllText(files[j + 1]));
+                                // i = row and j = col
+                                poolFilesData[key].Item2.Add(new Vector3(j / 2 * distanceSize, i * distanceSize, 0));
+                            }
+                            else
+                                poolFilesData.Add(
+                                    key,
+                                    new Tuple<List<string>, List<Vector3>>(
+                                        new List<string>() { File.ReadAllText(files[j + 1]) },
+                                        new List<Vector3>() { new Vector3(j / 2 * distanceSize, i * distanceSize, 0) }));
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int k = 0; k < poolFilesData.Count; k++)
+        {
+            pools.Add(new GesturePool());
+            pools[k].handModel = handModelObj;
+            pools[k].tag = poolFilesData.ElementAt(k).Key;
+
+            pools[k].CsvData = new TextAsset[poolFilesData.ElementAt(k).Value.Item1.Count];
+            for (int j = 0; j < poolFilesData.ElementAt(k).Value.Item1.Count; j++)
+                pools[k].CsvData[j] = new TextAsset(poolFilesData.ElementAt(k).Value.Item1[j]);
+
+            //pools[k].PositionFactor = new Vector3[poolFilesData.ElementAt(k).Value.Item2.Count];
+            //poolFilesData.ElementAt(k).Value.Item2.CopyTo(pools[k].PositionFactor);
+        }
+    }
+    #endregion*/
+
     private void Awake()
     {
         instance = this;
@@ -96,12 +184,6 @@ public class GestureDisplayer : MonoBehaviour
         
         for (int i =0; i < pools.ToArray().Length; i++)
         {
-            if (pools[i].PositionFactor.Length != pools[i].CsvData.Length)
-            {
-                Debug.LogWarning("The number of position factors must be the same as the number of .csv files!");
-                return;
-            }
-
             List<Gesture> geturePool = new List<Gesture>();
             for (int j = 0; j < pools[i].CsvData.Length; j++)
             {
@@ -140,6 +222,21 @@ public class GestureDisplayer : MonoBehaviour
     
     public List<GesturePool> pools;
     public Dictionary<string, List<Gesture>> poolDic;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void OnBeforeSceneLoadRuntimeMethod()
+    {
+        //Debug.Log("Before scene loaded");
+        //Debug.Log("GestureDisplayer OnLoad called");
+        //if (instance.pools == null)
+        //    Debug.Log("[L]Pool is unassigned");
+        //else
+        //    Debug.Log("[L]Pool is assigned");
+        //if (instance.poolDic == null)
+        //    Debug.Log("[L]PoolDic is unassigned");
+        //else
+        //    Debug.Log("[L]PoolDic is assigned");
+    }
 
     // Update is called once per frame
     void Update()
