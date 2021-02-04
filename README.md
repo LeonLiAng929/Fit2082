@@ -1,2 +1,2 @@
-# Fit2082
+# Hand Gesture Displayer & Analyzer 
  
