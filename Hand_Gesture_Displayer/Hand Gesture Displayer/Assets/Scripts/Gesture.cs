@@ -166,12 +166,7 @@ public class Gesture
     {
         if (SecondsToMs(timer) > last_timestamp)
         {
-            transforms = init_transforms;
-            timer = 0f;
-            csv_time = init_timestamp;
-            row_count = 1;
-            init = 1;
-            Update_row();
+            Reset();
         }
         if (SecondsToMs(timer) > csv_time)
         {
@@ -185,7 +180,7 @@ public class Gesture
     /// <summary>
     /// Animates the gesture in the scene based on given .csv file.
     /// </summary>
-    public void Animate()
+    public void AnimateInAnimationMode()
     {
         if (init == 1)
         {
@@ -204,6 +199,50 @@ public class Gesture
             float ratio = (SecondsToMs(timer) - pre_timestamp) / (csv_time - pre_timestamp);
             transforms[i].localPosition = Vector3.Lerp(start_pos, end_pos, ratio);
         }
+    }
+
+
+    public void AnimateInSliderMode(float max, float current)
+    {
+        float totalTime = last_timestamp - init_timestamp;
+       
+        timer = totalTime * (current/max);
+
+        ConditionCheckForSliderMode(timer);
+
+        for (int i = 1; i < transforms.Length; i++)
+        {
+            Vector3 start_pos = transforms[i].localPosition;
+            Vector3 end_pos = csv_coordinates[i - 1] + position_factor;
+
+            float ratio = (SecondsToMs(timer) - pre_timestamp) / (csv_time - pre_timestamp);
+            transforms[i].localPosition = Vector3.Lerp(start_pos, end_pos, ratio);
+        }
+    }
+
+    private void ConditionCheckForSliderMode(float time)
+    {
+        for (int i =0; i < processed_data.Length; i++)
+        {
+            if (processed_data[i].timestamp > time)
+            {
+                row_count = i;
+                csv_time = GetRelativeTimeStamp(processed_data[row_count].timestamp);
+                csv_coordinates = processed_data[row_count].jointsCoordinate;
+                pre_timestamp = GetRelativeTimeStamp(processed_data[row_count - 1].timestamp);
+                break;
+            }
+        }
+    }
+
+    public void Reset()
+    {
+        transforms = init_transforms;
+        timer = 0f;
+        csv_time = init_timestamp;
+        row_count = 1;
+        init = 1;
+        Update_row();
     }
 
     /// <summary>

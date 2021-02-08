@@ -51,6 +51,9 @@ public class GestureDisplayer : MonoBehaviour
     //public Transform gestureTagsContainer;
     public Text userInputTag;
     public TextMeshProUGUI showAllButtonText;
+    public TextMeshProUGUI switchModeButton;
+    public Slider slider;
+
     //public TMP_Text gestureTagDisplayWindow;
     private bool shown = false;
     private string previousInput = null;
@@ -59,6 +62,8 @@ public class GestureDisplayer : MonoBehaviour
     private float rescaleReference = 300;
     private float boundingLength;
     private float rescaleFactor;
+
+    private bool animationMode = true;
    
     #region Singleton
     public static GestureDisplayer instance;
@@ -223,6 +228,7 @@ public class GestureDisplayer : MonoBehaviour
     public List<GesturePool> pools;
     public Dictionary<string, List<Gesture>> poolDic;
 
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     static void OnBeforeSceneLoadRuntimeMethod()
     {
@@ -241,22 +247,29 @@ public class GestureDisplayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
+        if (animationMode)
         {
-            foreach (Gesture gesture in entry.Value){
-                gesture.ConditionCheck();
+            foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
+            {
+                foreach (Gesture gesture in entry.Value)
+                {
+                    gesture.ConditionCheck();
+                }
+
             }
-           
         }
     }
     
     void FixedUpdate()
     {
-        foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
+        if (animationMode)
         {
-            foreach (Gesture gesture in entry.Value)
+            foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
             {
-                gesture.Animate();
+                foreach (Gesture gesture in entry.Value)
+                {
+                    gesture.AnimateInAnimationMode();
+                }
             }
         }
     }
@@ -341,6 +354,49 @@ public class GestureDisplayer : MonoBehaviour
                     //gesture.getTag().SetActive(false);
                     //gestureTagDisplayWindow.text = gesture.getTag();
                 }
+            }
+        }
+    }
+
+    public void SwitchMode()
+    {
+        if (animationMode)
+        {
+            animationMode = false;
+            switchModeButton.text = "Animation Mode";
+            slider.gameObject.SetActive(true);
+            foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
+            {
+                foreach (Gesture gesture in entry.Value)
+                {
+                    gesture.Reset();
+                    
+                }
+            }
+        }
+        else
+        {
+            animationMode = true;
+            switchModeButton.text = "Slider Mode";
+            slider.gameObject.SetActive(false);
+            foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
+            {
+                foreach (Gesture gesture in entry.Value)
+                {
+                    gesture.Reset();
+                    
+                }
+            }
+        }
+    }
+    public void OnValueChanged()
+    {
+        Debug.Log(slider.value);
+        foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
+        {
+            foreach (Gesture gesture in entry.Value)
+            {
+                gesture.AnimateInSliderMode(slider.maxValue, slider.value);
             }
         }
     }
