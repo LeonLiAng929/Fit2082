@@ -391,7 +391,7 @@ public class GestureDisplayer : MonoBehaviour
     }
     public void OnValueChanged()
     {
-        Debug.Log(slider.value);
+        //Debug.Log(slider.value);
         foreach (KeyValuePair<string, List<Gesture>> entry in poolDic)
         {
             foreach (Gesture gesture in entry.Value)

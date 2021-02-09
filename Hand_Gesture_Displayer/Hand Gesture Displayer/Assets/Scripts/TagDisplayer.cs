@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class TagDisplayer : MonoBehaviour
 {
+    private bool selected = false;
     public Gesture gesture;
     public TMP_Text gestureTagDisplayWindow;
-    
+
     //When the mouse hovers over the GameObject, it turns to this color (red)
     Color m_MouseOverColor = Color.red;
 
@@ -28,12 +29,12 @@ public class TagDisplayer : MonoBehaviour
 
     public void Highlight()
     {
-        
-        foreach(MeshRenderer m in m_Renderer)
+
+        foreach (MeshRenderer m in m_Renderer)
         {
             m.material.color = m_MouseOverColor;
         }
-       
+
     }
 
     public void UnHightlight()
@@ -57,5 +58,23 @@ public class TagDisplayer : MonoBehaviour
     {
         gestureTagDisplayWindow.text = "";
         //gesture.getTag().SetActive(false);
+    }
+
+    public void Select()
+    {
+        selected = true;
+        Analyser.instance.selectedGestures.Add(gesture);
+    }
+
+    public bool IfSelected()
+    {
+        return selected;
+    }
+
+    public void Unselect()
+    {
+        //Debug.Log(GetComponentInParent<GameObject>().GetComponentInParent<Analyser>());  
+        selected = false;
+        Analyser.instance.selectedGestures.Remove(gesture);
     }
 }

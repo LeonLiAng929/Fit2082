@@ -12,7 +12,6 @@ public class TagDisplayer_Aux : MonoBehaviour
 
     //Get the GameObject’s mesh renderer to access the GameObject’s material and color
     MeshRenderer m_Renderer;
-
     TagDisplayer parent;
 
     void Start()
@@ -27,10 +26,31 @@ public class TagDisplayer_Aux : MonoBehaviour
         parent.DisplayTag();
     }
 
+    void OnMouseUp()
+    {
+        if (parent.IfSelected())
+        {
+            parent.Unselect();
+            parent.UnHightlight();
+        }
+        else
+        {
+            parent.Select();
+            parent.Highlight();
+        }
+    }
+
     void OnMouseExit()
     {
         // Reset the color of the GameObject back to normal
-        parent.UnHightlight();
-        parent.HideTag();
+        if (parent.IfSelected())
+        {
+            parent.HideTag();
+        }
+        else
+        {
+            parent.UnHightlight();
+            parent.HideTag();
+        }
     }
 }

@@ -42,7 +42,16 @@ public class Analyser : MonoBehaviour
     public GameObject table;
     public Text input;
     public Text tolerance;
+    public List<Gesture> selectedGestures;
     private string gesturePoolTag;
+    #region Singleton
+    public static Analyser instance;
+    #endregion
+
+    void Awake()
+    {
+        instance = this;
+    }
 
     /// <summary>
     /// Computes the Euclidean distance between two points
